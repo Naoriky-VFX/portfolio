@@ -333,111 +333,70 @@ document.querySelectorAll('[data-year]').forEach((node) => {
 
 
 
+
 // ===== compartilhar =====
-(() => {
-  const btn = document.getElementById('share-btn');
-  const modal = document.getElementById('share-modal');
+(function () {
+  var btn = document.getElementById('share-btn');
+  var modal = document.getElementById('share-modal');
   if (!btn || !modal) return;
-  const feedback = document.getElementById('share-feedback');
-  const url = 'https://portfolio.programer.site/';
-  const text = 'Portfolio do Evandro Tavares - bots, paineis, apps e automacoes com IA.';
-  const canNative = typeof navigator.share === 'function';
+  var feedback = document.getElementById('share-feedback');
+  var URL_SITE = 'https://portfolio.programer.site/';
 
-  const schemes = {
-    whatsapp: `whatsapp://send?text=${encodeURIComponent(text + ' ' + url)}`,
-    telegram: `tg://msg_url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-    facebook: `fb://share?link=${encodeURIComponent(url)}`,
-    x: `twitter://post?message=${encodeURIComponent(text + ' ' + url)}`,
-    linkedin: `linkedin://shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`
-  };
-  const webs = {
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`,
-    telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-    x: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
-  };
-
-  const say = (msg) => {
+  function openModal() {
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+  function say(msg) {
     if (!feedback) return;
     feedback.textContent = msg;
-    setTimeout(() => { feedback.textContent = ''; }, 2600);
-  };
-
-  const nativeShare = async () => {
-    if (!canNative) return false;
+    setTimeout(function () { feedback.textContent = ''; }, 2600);
+  }
+  function shareNative() {
+    if (!navigator.share) return false;
     try {
-      await Promise.race([
-        navigator.share({ title: 'Evandro Tavares | Full Stack & IA', url }),
-        new Promise((resolve) => setTimeout(() => resolve('timeout'), 12000))
-      ]);
+      navigator.share({ title: 'Evandro Tavares | Full Stack & IA', url: URL_SITE });
       return true;
-    } catch (e) {
-      if (e && e.name === 'AbortError') return true;
+    } catch (err) {
       return false;
     }
-  };
+  }
 
-  const openApp = (kind) => {
-    const proceedWeb = () => { if (webs[kind]) window.open(webs[kind], '_blank'); };
-    if (!schemes[kind]) { proceedWeb(); return; }
-    const start = Date.now();
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = schemes[kind];
-    document.body.appendChild(iframe);
-    setTimeout(() => {
-      iframe.remove();
-      if (Date.now() - start < 1600 && !document.hidden) proceedWeb();
-    }, 1200);
-  };
-
-  const open = () => { modal.hidden = false; document.body.style.overflow = 'hidden'; };
-  const close = () => { modal.hidden = true; document.body.style.overflow = ''; };
-
-  let lastClick = 0;
-  btn.addEventListener('click', async () => {
-    const now = Date.now();
-    if (now - lastClick < 1200) return;
-    lastClick = now;
-    if (!canNative) { open(); return; }
-    const ok = await nativeShare();
-    if (!ok) { open(); }
+  btn.addEventListener('click', function () {
+    if (!shareNative()) openModal();
   });
 
-  modal.querySelector('.share-close').addEventListener('click', close);
-  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
+  modal.querySelector('.share-close').addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 
-  modal.querySelectorAll('[data-share]').forEach((el) => {
-    el.removeAttribute('href');
-    el.addEventListener('click', async (e) => {
+  var webs = {
+    whatsapp: 'https://wa.me/?text=' + encodeURIComponent(URL_SITE),
+    telegram: 'https://t.me/share/url?url=' + encodeURIComponent(URL_SITE),
+    facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(URL_SITE),
+    x: 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(URL_SITE),
+    linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(URL_SITE)
+  };
+
+  Array.prototype.forEach.call(modal.querySelectorAll('[data-share]'), function (el) {
+    el.addEventListener('click', function (e) {
       e.preventDefault();
-      e.stopPropagation();
-      const kind = el.dataset.share;
-
+      var kind = el.dataset.share;
+      if (kind === 'copy' || kind === 'instagram') {
+        navigator.clipboard.writeText(URL_SITE).then(function () {
+          say(kind === 'instagram' ? 'Link copiado - cole no Instagram' : 'Link copiado!');
+        }).catch(function () { say('Copie: ' + URL_SITE); });
+        return;
+      }
       if (kind === 'native') {
-        const ok = await nativeShare();
-        if (!ok) say('Compartilhamento do sistema indisponivel');
+        if (!shareNative()) say('Compartilhamento do sistema indisponivel');
         return;
       }
-
-      if (kind === 'copy') {
-        try { await navigator.clipboard.writeText(url); say('Link copiado!'); }
-        catch (err) { say('Copie: ' + url); }
-        return;
-      }
-
-      if (kind === 'instagram') {
-        const ok = await nativeShare();
-        if (ok) return;
-        try { await navigator.clipboard.writeText(url); } catch (err) {}
-        say('Link copiado - cole no Instagram');
-        return;
-      }
-
-      if (canNative) { const ok = await nativeShare(); if (ok) return; }
-      openApp(kind);
+      if (shareNative()) return;
+      if (webs[kind]) window.open(webs[kind], '_blank');
     });
   });
 })();

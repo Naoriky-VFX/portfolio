@@ -328,3 +328,36 @@ document.querySelectorAll('[data-year]').forEach((node) => {
     btn.addEventListener('click', () => send(btn.dataset.ask || btn.textContent));
   });
 })();
+
+// ===== compartilhar =====
+(() => {
+  const btn = document.getElementById('share-btn');
+  if (!btn) return;
+  const toast = document.createElement('div');
+  toast.className = 'share-toast';
+  toast.textContent = 'Link copiado!';
+  document.body.appendChild(toast);
+  let t;
+  const showToast = (msg) => {
+    toast.textContent = msg;
+    toast.classList.add('is-on');
+    clearTimeout(t);
+    t = setTimeout(() => toast.classList.remove('is-on'), 2200);
+  };
+  btn.addEventListener('click', async () => {
+    const data = {
+      title: 'Evandro Tavares | Full Stack & IA',
+      text: 'Olha o portfólio do Evandro — bots, painéis, apps e automações com IA.',
+      url: location.href
+    };
+    if (navigator.share) {
+      try { await navigator.share(data); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    try {
+      await navigator.clipboard.writeText(data.url);
+      showToast('Link copiado!');
+    } catch (e) {
+      showToast('Copie: ' + data.url);
+    }
+  });
+})();

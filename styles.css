@@ -611,3 +611,19 @@ main > .brand-section:first-child { border-bottom: 0; box-shadow: none; }
   main > section { content-visibility: auto; contain-intrinsic-size: 900px; }
   .brand-section, .hero { content-visibility: visible; }
 }
+
+/* ===== botão compartilhar ===== */
+.share-btn { position: fixed; right: 22px; bottom: 22px; z-index: 60; display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 18px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(41,215,255,.45); background: rgba(6,14,26,.86); color: #dff3ff;
+  font: 10px var(--mono); letter-spacing: .14em; text-transform: uppercase;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 0 1px rgba(41,215,255,.08);
+  backdrop-filter: blur(8px); transition: transform .3s var(--ease), border-color .3s, box-shadow .3s, background .3s; }
+.share-btn svg { color: var(--accent); }
+.share-btn:hover { transform: translateY(-2px); border-color: rgba(41,215,255,.9); background: rgba(10,22,40,.95);
+  box-shadow: 0 14px 36px rgba(41,215,255,.25); }
+.share-toast { position: fixed; right: 22px; bottom: 84px; z-index: 61; padding: 10px 14px; border-radius: 10px;
+  background: rgba(8,18,32,.96); border: 1px solid rgba(41,215,255,.35); color: #dff3ff; font: 11px var(--mono);
+  opacity: 0; transform: translateY(6px); transition: opacity .25s, transform .25s; pointer-events: none; }
+.share-toast.is-on { opacity: 1; transform: translateY(0); }
+@media (max-width: 680px) { .share-btn { right: 14px; bottom: 14px; padding: 12px 15px; font-size: 9px; } .share-btn span { display: none; } .share-toast { right: 14px; bottom: 72px; } }

@@ -627,3 +627,7 @@ main > .brand-section:first-child { border-bottom: 0; box-shadow: none; }
   opacity: 0; transform: translateY(6px); transition: opacity .25s, transform .25s; pointer-events: none; }
 .share-toast.is-on { opacity: 1; transform: translateY(0); }
 @media (max-width: 680px) { .share-btn { right: 14px; bottom: 14px; padding: 12px 15px; font-size: 9px; } .share-btn span { display: none; } .share-toast { right: 14px; bottom: 72px; } }
+
+/* compartilhar somente no celular */
+@media (min-width: 681px) { .share-btn { display: none !important; } }
+@media (max-width: 680px) { .share-btn { display: inline-flex !important; } }

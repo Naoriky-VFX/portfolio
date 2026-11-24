@@ -577,3 +577,37 @@ main > .brand-section:first-child { border-bottom: 0; box-shadow: none; }
   .footer-bottom { display: grid; gap: 16px; }
   .site-footer { padding-top: 48px; }
 }
+
+/* ===== performance no celular ===== */
+@media (max-width: 680px) {
+  .bg-canvas, .bg-grid, .bg-glow, .bg-scan, .bg-horizon, .brand-orbit, .brand-beam { display: none !important; }
+  .cursor-halo { display: none !important; }
+  body { background: radial-gradient(120% 80% at 50% -10%, #07182c 0%, #030711 55%, #010306 100%); }
+  .brand-name { filter: none; animation: none; }
+  .brand-inner::after { display: none; }
+  .chat-card, .contact-card, .project-card { box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+  .chat-card::before, .project-art::after, .contact-card::before { display: none; }
+  .site-header.is-scrolled { backdrop-filter: none; background: rgba(4,8,16,.96); }
+  .reveal { transition-duration: .45s; }
+  .reveal, .reveal * { will-change: auto; }
+  main > section { content-visibility: auto; contain-intrinsic-size: 900px; }
+  .brand-section, .hero { content-visibility: visible; }
+  .mq-track { animation-duration: 60s; }
+  .text-link::after, .brand-tags span:hover { box-shadow: none; }
+}
+
+/* ===== mobile leve, sem perder o visual ===== */
+@media (max-width: 680px) {
+  .bg-canvas { display: block !important; opacity: .55; }
+  .bg-grid { display: block !important; opacity: .22; animation: none; }
+  .bg-glow { display: block !important; opacity: .55; filter: none; animation: none; }
+  .bg-scan { display: none !important; }
+  .brand-orbit { display: grid !important; opacity: .55; }
+  .brand-orbit i { animation: none; }
+  .brand-orbit i:nth-child(2), .brand-orbit i:nth-child(3) { display: none; }
+  .brand-beam { display: none !important; }
+  .brand-name { filter: drop-shadow(0 0 18px rgba(41,215,255,.35)); animation: none; }
+  .site-header.is-scrolled { backdrop-filter: none; }
+  main > section { content-visibility: auto; contain-intrinsic-size: 900px; }
+  .brand-section, .hero { content-visibility: visible; }
+}

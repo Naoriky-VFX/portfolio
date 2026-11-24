@@ -114,6 +114,7 @@ document.querySelectorAll('[data-year]').forEach((node) => {
 (() => {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
+  const isMobile = window.matchMedia('(max-width: 680px)').matches;
   const ctx = canvas.getContext('2d');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let w, h, dpr, nodes = [], raf;
@@ -126,7 +127,7 @@ document.querySelectorAll('[data-year]').forEach((node) => {
     w = canvas.clientWidth; h = canvas.clientHeight;
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const count = Math.min(90, Math.round((w * h) / 22000));
+    const count = isMobile ? 22 : Math.min(90, Math.round((w * h) / 22000));
     nodes = Array.from({ length: count }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -147,8 +148,8 @@ document.querySelectorAll('[data-year]').forEach((node) => {
         const b = nodes[j];
         const dx = a.x - b.x, dy = a.y - b.y;
         const d2 = dx * dx + dy * dy;
-        if (d2 < 18000) {
-          const o = 1 - d2 / 18000;
+        if (d2 < (isMobile ? 12000 : 18000)) {
+          const o = 1 - d2 / (isMobile ? 12000 : 18000);
           ctx.strokeStyle = `rgba(90,170,255,${o * .28})`;
           ctx.lineWidth = .7;
           ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
@@ -171,7 +172,7 @@ document.querySelectorAll('[data-year]').forEach((node) => {
     }
 
     // conexões do site até o cursor
-    if (mx > -1000) {
+    if (!isMobile && mx > -1000) {
       for (let k = 0; k < nodes.length; k++) {
         const n = nodes[k];
         const dx = n.x - mx, dy = n.y - my;
@@ -193,7 +194,11 @@ document.querySelectorAll('[data-year]').forEach((node) => {
       ctx.beginPath(); ctx.arc(mx, my, 110, 0, Math.PI * 2); ctx.fill();
     }
 
-    raf = requestAnimationFrame(draw);
+    if (isMobile) {
+      raf = setTimeout(() => requestAnimationFrame(draw), 42);
+    } else {
+      raf = requestAnimationFrame(draw);
+    }
   };
 
   resize();

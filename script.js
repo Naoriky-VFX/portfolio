@@ -332,6 +332,7 @@ document.querySelectorAll('[data-year]').forEach((node) => {
 
 
 
+
 // ===== compartilhar =====
 (() => {
   const btn = document.getElementById('share-btn');
@@ -339,17 +340,48 @@ document.querySelectorAll('[data-year]').forEach((node) => {
   if (!btn || !modal) return;
   const feedback = document.getElementById('share-feedback');
   const url = 'https://portfolio.programer.site/';
-  const data = {
-    title: 'Evandro Tavares | Full Stack & IA',
-    text: 'Olha o portfolio do Evandro - bots, paineis, apps e automacoes com IA.',
-    url
-  };
-
+  const text = 'Portfolio do Evandro Tavares - bots, paineis, apps e automacoes com IA.';
   const canNative = typeof navigator.share === 'function';
 
+  const schemes = {
+    whatsapp: `whatsapp://send?text=${encodeURIComponent(text + ' ' + url)}`,
+    telegram: `tg://msg_url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+    facebook: `fb://share?link=${encodeURIComponent(url)}`,
+    x: `twitter://post?message=${encodeURIComponent(text + ' ' + url)}`,
+    linkedin: `linkedin://shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`
+  };
+  const webs = {
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`,
+    telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    x: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+  };
+
+  const say = (msg) => {
+    if (!feedback) return;
+    feedback.textContent = msg;
+    setTimeout(() => { feedback.textContent = ''; }, 2600);
+  };
+
   const nativeShare = async () => {
-    try { await navigator.share(data); return true; }
-    catch (e) { if (e && e.name === 'AbortError') return true; return false; }
+    if (!canNative) return false;
+    try { await navigator.share({ title: 'Evandro Tavares | Full Stack & IA', text, url }); return true; }
+    catch (e) { return e && e.name === 'AbortError'; }
+  };
+
+  const openApp = (kind) => {
+    const proceedWeb = () => { if (webs[kind]) window.open(webs[kind], '_blank'); };
+    if (!schemes[kind]) { proceedWeb(); return; }
+    const start = Date.now();
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = schemes[kind];
+    document.body.appendChild(iframe);
+    setTimeout(() => {
+      iframe.remove();
+      if (Date.now() - start < 1600 && !document.hidden) proceedWeb();
+    }, 1200);
   };
 
   const open = () => { modal.hidden = false; document.body.style.overflow = 'hidden'; };
@@ -364,33 +396,35 @@ document.querySelectorAll('[data-year]').forEach((node) => {
   modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
 
-  const links = {
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(data.text + ' ' + url)}`,
-    telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(data.text)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-    x: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(data.text)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
-  };
-
   modal.querySelectorAll('[data-share]').forEach((el) => {
-    const kind0 = el.dataset.share;
-    if (links[kind0]) el.setAttribute('href', links[kind0]);
+    el.removeAttribute('href');
     el.addEventListener('click', async (e) => {
       e.preventDefault();
+      e.stopPropagation();
       const kind = el.dataset.share;
-      if (!canNative) {
-        if (links[kind]) { window.open(links[kind], '_blank'); close(); return; }
-      }
-      if (kind === 'copy') {
-        try { await navigator.clipboard.writeText(url); feedback.textContent = 'Link copiado!'; }
-        catch (err) { feedback.textContent = 'Copie: ' + url; }
-        setTimeout(() => { feedback.textContent = ''; }, 2200);
+
+      if (kind === 'native') {
+        const ok = await nativeShare();
+        if (!ok) say('Compartilhamento do sistema indisponivel');
         return;
       }
-      const ok = await nativeShare();
-      if (ok) { close(); return; }
-      feedback.textContent = 'Compartilhamento indisponivel aqui';
-      setTimeout(() => { feedback.textContent = ''; }, 2500);
+
+      if (kind === 'copy') {
+        try { await navigator.clipboard.writeText(url); say('Link copiado!'); }
+        catch (err) { say('Copie: ' + url); }
+        return;
+      }
+
+      if (kind === 'instagram') {
+        const ok = await nativeShare();
+        if (ok) return;
+        try { await navigator.clipboard.writeText(url); } catch (err) {}
+        say('Link copiado - cole no Instagram');
+        return;
+      }
+
+      if (canNative) { const ok = await nativeShare(); if (ok) return; }
+      openApp(kind);
     });
   });
 })();

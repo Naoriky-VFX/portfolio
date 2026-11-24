@@ -27,9 +27,10 @@ const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 if (!prefersReduced) {
   revealItems.forEach((item, index) => {
     const rect = item.getBoundingClientRect();
+    const isSmall = window.matchMedia('(max-width: 680px)').matches;
     const fromLeft = rect.left + rect.width / 2 < window.innerWidth / 2;
-    const dx = fromLeft ? -72 : 72;
-    const dy = 26;
+    const dx = isSmall ? 0 : (fromLeft ? -72 : 72);
+    const dy = isSmall ? 18 : 26;
     item.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
     item.style.transitionDelay = `${(index % 3) * 70}ms`;
   });
@@ -329,35 +330,59 @@ document.querySelectorAll('[data-year]').forEach((node) => {
   });
 })();
 
+
 // ===== compartilhar =====
 (() => {
   const btn = document.getElementById('share-btn');
-  if (!btn) return;
-  const toast = document.createElement('div');
-  toast.className = 'share-toast';
-  toast.textContent = 'Link copiado!';
-  document.body.appendChild(toast);
-  let t;
-  const showToast = (msg) => {
-    toast.textContent = msg;
-    toast.classList.add('is-on');
-    clearTimeout(t);
-    t = setTimeout(() => toast.classList.remove('is-on'), 2200);
+  const modal = document.getElementById('share-modal');
+  if (!btn || !modal) return;
+  const feedback = document.getElementById('share-feedback');
+  const url = location.href;
+  const text = 'Olha o portfolio do Evandro - bots, paineis, apps e automacoes com IA.';
+
+  const open = () => { modal.hidden = false; document.body.style.overflow = 'hidden'; };
+  const close = () => { modal.hidden = true; document.body.style.overflow = ''; };
+
+  btn.addEventListener('click', open);
+  modal.querySelector('.share-close').addEventListener('click', close);
+  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
+
+  const links = {
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`,
+    telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    x: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
   };
-  btn.addEventListener('click', async () => {
-    const data = {
-      title: 'Evandro Tavares | Full Stack & IA',
-      text: 'Olha o portfólio do Evandro — bots, painéis, apps e automações com IA.',
-      url: location.href
-    };
-    if (navigator.share) {
-      try { await navigator.share(data); return; } catch (e) { if (e && e.name === 'AbortError') return; }
-    }
-    try {
-      await navigator.clipboard.writeText(data.url);
-      showToast('Link copiado!');
-    } catch (e) {
-      showToast('Copie: ' + data.url);
-    }
+
+  modal.querySelectorAll('[data-share]').forEach((el) => {
+    const kind = el.dataset.share;
+    if (links[kind]) el.setAttribute('href', links[kind]);
+    el.addEventListener('click', async (e) => {
+      if (links[kind]) { return; }
+      e.preventDefault();
+      if (kind === 'copy') {
+        try { await navigator.clipboard.writeText(url); feedback.textContent = 'Link copiado!'; }
+        catch (err) { feedback.textContent = 'Copie: ' + url; }
+        setTimeout(() => { feedback.textContent = ''; }, 2200);
+        return;
+      }
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Evandro Tavares | Full Stack & IA', text, url });
+          close();
+          return;
+        } catch (err) { if (err && err.name === 'AbortError') return; }
+      }
+      if (kind === 'instagram') {
+        try { await navigator.clipboard.writeText(url); } catch (err) {}
+        feedback.textContent = 'Link copiado - cole no Instagram';
+        setTimeout(() => { feedback.textContent = ''; }, 3000);
+        return;
+      }
+      feedback.textContent = 'Compartilhamento indisponivel aqui';
+      setTimeout(() => { feedback.textContent = ''; }, 2500);
+    });
   });
 })();

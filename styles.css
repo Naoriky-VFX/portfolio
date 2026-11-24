@@ -631,3 +631,63 @@ main > .brand-section:first-child { border-bottom: 0; box-shadow: none; }
 /* compartilhar somente no celular */
 @media (min-width: 681px) { .share-btn { display: none !important; } }
 @media (max-width: 680px) { .share-btn { display: inline-flex !important; } }
+
+/* ===== modal de compartilhar ===== */
+.share-modal { position: fixed; inset: 0; z-index: 80; display: grid; align-items: end; justify-items: center;
+  background: rgba(2,5,10,.72); backdrop-filter: blur(6px); }
+.share-modal[hidden] { display: none; }
+.share-sheet { width: min(520px, 100%); padding: 20px 20px 26px; border-radius: 20px 20px 0 0;
+  background: linear-gradient(180deg, #0b1626, #060d18); border: 1px solid rgba(120,170,255,.25); border-bottom: 0;
+  box-shadow: 0 -20px 60px rgba(0,0,0,.6); animation: sheetUp .28s var(--ease); }
+@keyframes sheetUp { from { transform: translateY(24px); opacity: .6; } to { transform: translateY(0); opacity: 1; } }
+.share-sheet-head { display: flex; align-items: center; justify-content: space-between; }
+.share-sheet-head strong { font-size: 17px; letter-spacing: -.01em; }
+.share-close { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(150,190,240,.25);
+  background: rgba(10,20,34,.8); color: #cfe4ff; cursor: pointer; font-size: 12px; }
+.share-sub { margin: 6px 0 18px; color: var(--muted); font: 10px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.share-item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px 12px;
+  border: 1px solid rgba(120,170,255,.18); border-radius: 14px; background: rgba(12,22,40,.7);
+  color: #cfe4ff; font: 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+  transition: border-color .25s, transform .25s, box-shadow .25s; }
+.share-item:hover { border-color: rgba(41,215,255,.65); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(41,215,255,.18); }
+.si { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; font-weight: 700;
+  background: rgba(41,215,255,.12); color: #bfe6ff; border: 1px solid rgba(41,215,255,.35); }
+.si-wa { background: rgba(37,211,102,.14); border-color: rgba(37,211,102,.5); color: #7df0ad; }
+.si-tg { background: rgba(0,136,204,.16); border-color: rgba(0,136,204,.5); color: #7fd4ff; }
+.si-fb { background: rgba(24,119,242,.16); border-color: rgba(24,119,242,.5); color: #9dc6ff; }
+.si-x { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.3); color: #eaf6ff; }
+.si-in { background: rgba(10,102,194,.16); border-color: rgba(10,102,194,.5); color: #9dc6ff; }
+.si-ig { background: rgba(225,48,108,.14); border-color: rgba(225,48,108,.5); color: #ffa6c6; }
+.si-more { background: rgba(168,85,247,.14); border-color: rgba(168,85,247,.45); color: #d3b6ff; }
+.si-link { background: rgba(150,190,240,.12); border-color: rgba(150,190,240,.35); color: #d6e6ff; }
+.share-toast-inline { min-height: 16px; margin: 14px 0 0; color: var(--accent); font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; text-align: center; }
+@media (min-width: 681px) { .share-modal { display: none !important; } }
+
+@media (max-width: 680px) {
+  .share-grid { grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  .share-item { padding: 12px 4px 10px; font-size: 9px; }
+  .si { width: 36px; height: 36px; font-size: 14px; }
+  .share-sheet { max-height: 88vh; overflow-y: auto; }
+}
+
+/* ===== sem overflow no celular ===== */
+@media (max-width: 680px) {
+  html, body { overflow-x: hidden; max-width: 100%; }
+  .site-shell { overflow-x: hidden; }
+  .bg-canvas, .bg-grid, .bg-glow { width: 100% !important; max-width: 100% !important; }
+  .bg-glow { left: auto !important; right: 0 !important; }
+  .hero-grid { display: block; }
+  .chat-card { justify-self: stretch !important; width: 100% !important; max-width: 100% !important; margin: 0; }
+  .hero-copy, .hero-grid > * { max-width: 100%; }
+  .signal-panel { max-width: 100% !important; }
+  .project-code { white-space: pre-wrap; word-break: break-word; }
+  .contact-card { max-width: 100%; }
+}
+
+@media (max-width: 680px) {
+  .share-btn { z-index: 90; }
+  .site-shell { position: relative; z-index: 1; }
+  .share-modal { z-index: 95; }
+  .reveal { transform: none; }
+}

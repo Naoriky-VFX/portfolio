@@ -366,8 +366,13 @@ document.querySelectorAll('[data-year]').forEach((node) => {
 
   const nativeShare = async () => {
     if (!canNative) return false;
-    try { await navigator.share({ title: 'Evandro Tavares | Full Stack & IA', text, url }); return true; }
-    catch (e) { return e && e.name === 'AbortError'; }
+    try {
+      await navigator.share({ title: 'Evandro Tavares | Full Stack & IA', url });
+      return true;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return true;
+      return false;
+    }
   };
 
   const openApp = (kind) => {
@@ -387,9 +392,15 @@ document.querySelectorAll('[data-year]').forEach((node) => {
   const open = () => { modal.hidden = false; document.body.style.overflow = 'hidden'; };
   const close = () => { modal.hidden = true; document.body.style.overflow = ''; };
 
+  let busy = false;
   btn.addEventListener('click', async () => {
-    if (canNative) { await nativeShare(); return; }
-    open();
+    if (busy) return;
+    busy = true;
+    try {
+      if (canNative) { await nativeShare(); } else { open(); }
+    } finally {
+      setTimeout(() => { busy = false; }, 700);
+    }
   });
 
   modal.querySelector('.share-close').addEventListener('click', close);

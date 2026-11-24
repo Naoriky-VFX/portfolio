@@ -266,7 +266,7 @@ document.querySelectorAll('[data-year]').forEach((node) => {
 
   const replies = [
     { k: ['oi', 'ola', 'olá', 'bom dia', 'boa tarde', 'boa noite', 'eai', 'e ai'], r: 'Oi! Que bom te ver por aqui 😊 Posso te contar sobre bots de atendimento, sites, painéis e automações com IA. O que te interessa?' },
-    { k: ['bot', 'whatsapp', 'zap', 'atendimento', 'instagram', 'telegram', 'discord', 'facebook'], r: 'Faço bots para WhatsApp, Instagram, Telegram e Discord: respondem dúvidas, qualificam contatos e passam para uma pessoa quando precisa. Já coloquei dois no ar rodando 24 horas.' },
+    { k: ['bot', 'whatsapp', 'zap', 'atendimento', 'instagram', 'telegram', 'discord', 'facebook'], r: 'Faço bots para WhatsApp, Instagram, Telegram, Discord, Facebook e TikTok: respondem dúvidas, qualificam contatos e passam para uma pessoa quando precisa. Já coloquei dois no ar rodando 24 horas.' },
     { k: ['site', 'website', 'landing', 'página', 'pagina'], r: 'Sim! Desenvolvo sites e painéis administrativos sob medida, com login, banco de dados e relatórios — do design à publicação.' },
     { k: ['prazo', 'tempo', 'quanto tempo', 'demora', 'entrega'], r: 'Depende do tamanho: uma automação simples sai em poucos dias; um sistema com painel e integrações costuma levar de 2 a 6 semanas. Sempre com etapa de teste antes de entregar.' },
     { k: ['preço', 'preco', 'valor', 'custa', 'custo', 'quanto'], r: 'Cada projeto é orçado pelo escopo, sem surpresa no meio do caminho. Me chama no LinkedIn que o Evandro te passa uma proposta na hora.' },

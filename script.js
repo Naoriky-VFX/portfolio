@@ -338,7 +338,7 @@ document.querySelectorAll('[data-year]').forEach((node) => {
   const modal = document.getElementById('share-modal');
   if (!btn || !modal) return;
   const feedback = document.getElementById('share-feedback');
-  const url = location.href;
+  const url = 'https://portfolio.programer.site/';
   const data = {
     title: 'Evandro Tavares | Full Stack & IA',
     text: 'Olha o portfolio do Evandro - bots, paineis, apps e automacoes com IA.',

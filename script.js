@@ -334,6 +334,7 @@ document.querySelectorAll('[data-year]').forEach((node) => {
 
 
 
+
 // ===== compartilhar =====
 (function () {
   var btn = document.getElementById('share-btn');
@@ -355,19 +356,21 @@ document.querySelectorAll('[data-year]').forEach((node) => {
     feedback.textContent = msg;
     setTimeout(function () { feedback.textContent = ''; }, 2600);
   }
+
   function shareNative() {
-    if (!navigator.share) return null;
-    try {
-      return navigator.share({ title: 'Evandro Tavares | Full Stack & IA', url: URL_SITE });
-    } catch (err) {
-      return null;
-    }
+    if (!navigator.share) return Promise.resolve(false);
+    return navigator.share({ text: URL_SITE })
+      .then(function () { return true; })
+      .catch(function (err) {
+        if (err && err.name === 'AbortError') return true;
+        return navigator.share({ url: URL_SITE })
+          .then(function () { return true; })
+          .catch(function () { return false; });
+      });
   }
 
   btn.addEventListener('click', function () {
-    var p = shareNative();
-    if (!p) { openModal(); return; }
-    if (p.catch) p.catch(function () { openModal(); });
+    shareNative().then(function (ok) { if (!ok) openModal(); });
   });
 
   modal.querySelector('.share-close').addEventListener('click', closeModal);
@@ -393,13 +396,12 @@ document.querySelectorAll('[data-year]').forEach((node) => {
         return;
       }
       if (kind === 'native') {
-        var pn = shareNative();
-        if (!pn) say('Compartilhamento do sistema indisponivel');
+        shareNative().then(function (ok) { if (!ok) say('Compartilhamento do sistema indisponivel'); });
         return;
       }
-      var p = shareNative();
-      if (p) { if (p.catch) p.catch(function () { if (webs[kind]) window.open(webs[kind], '_blank'); }); return; }
-      if (webs[kind]) window.open(webs[kind], '_blank');
+      shareNative().then(function (ok) {
+        if (!ok && webs[kind]) window.open(webs[kind], '_blank');
+      });
     });
   });
 })();

@@ -356,17 +356,18 @@ document.querySelectorAll('[data-year]').forEach((node) => {
     setTimeout(function () { feedback.textContent = ''; }, 2600);
   }
   function shareNative() {
-    if (!navigator.share) return false;
+    if (!navigator.share) return null;
     try {
-      navigator.share({ title: 'Evandro Tavares | Full Stack & IA', url: URL_SITE });
-      return true;
+      return navigator.share({ title: 'Evandro Tavares | Full Stack & IA', url: URL_SITE });
     } catch (err) {
-      return false;
+      return null;
     }
   }
 
   btn.addEventListener('click', function () {
-    if (!shareNative()) openModal();
+    var p = shareNative();
+    if (!p) { openModal(); return; }
+    if (p.catch) p.catch(function () { openModal(); });
   });
 
   modal.querySelector('.share-close').addEventListener('click', closeModal);
@@ -392,10 +393,12 @@ document.querySelectorAll('[data-year]').forEach((node) => {
         return;
       }
       if (kind === 'native') {
-        if (!shareNative()) say('Compartilhamento do sistema indisponivel');
+        var pn = shareNative();
+        if (!pn) say('Compartilhamento do sistema indisponivel');
         return;
       }
-      if (shareNative()) return;
+      var p = shareNative();
+      if (p) { if (p.catch) p.catch(function () { if (webs[kind]) window.open(webs[kind], '_blank'); }); return; }
       if (webs[kind]) window.open(webs[kind], '_blank');
     });
   });
